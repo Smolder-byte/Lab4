@@ -38,7 +38,7 @@ public class WandsPanel extends JPanel {
     }
 
     public void displayWands(List<Wand> wands) {
-        String[] columnNames = {"ID", "ID сердцевины", "ID древесины", "Статус"};
+        String[] columnNames = {"ID", "Cердцевина", "Древесина", "Статус"};
         Object[][] data = new Object[wands.size()][4];
         
         for (int i = 0; i < wands.size(); i++) {
