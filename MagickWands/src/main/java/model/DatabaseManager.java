@@ -69,14 +69,34 @@ public class DatabaseManager {
     }
 
     public void addMaterial(String type, String name, int quantity) throws SQLException {
-        String sql = "INSERT INTO materials (type, name, quantity) VALUES (?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, type);
-            pstmt.setString(2, name);
-            pstmt.setInt(3, quantity);
-            pstmt.executeUpdate();
+    String checkSql = "SELECT id, quantity FROM materials WHERE type = ? AND name = ?";
+    
+    try (PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
+        checkStmt.setString(1, type);
+        checkStmt.setString(2, name);
+        ResultSet rs = checkStmt.executeQuery();
+        
+        if (rs.next()) {
+            int existingId = rs.getInt("id");
+            int existingQuantity = rs.getInt("quantity");
+            
+            String updateSql = "UPDATE materials SET quantity = ? WHERE id = ?";
+            try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
+                updateStmt.setInt(1, existingQuantity + quantity);
+                updateStmt.setInt(2, existingId);
+                updateStmt.executeUpdate();
+            }
+        } else {
+            String insertSql = "INSERT INTO materials (type, name, quantity) VALUES (?, ?, ?)";
+            try (PreparedStatement insertStmt = connection.prepareStatement(insertSql)) {
+                insertStmt.setString(1, type);
+                insertStmt.setString(2, name);
+                insertStmt.setInt(3, quantity);
+                insertStmt.executeUpdate();
+            }
         }
     }
+}
 
     public List<Wand> getAllWands() throws SQLException {
     List<Wand> wands = new ArrayList<>();
